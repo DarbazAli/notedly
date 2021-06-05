@@ -5,25 +5,7 @@ import morgan from 'morgan'
 import { ApolloServer, gql } from 'apollo-server-express'
 
 import connection from './db/connectDB.js'
-import Note from './models/noteModel.js'
-
-const notes = [
-  {
-    id: 1,
-    content: 'This is a note',
-    author: 'Adam Scott',
-  },
-  {
-    id: 2,
-    content: 'This is another note',
-    author: 'Harlow Everly',
-  },
-  {
-    id: 3,
-    content: 'Oh hey look, another note',
-    author: 'Riley Harrison',
-  },
-]
+import models from './models/index.js'
 
 // env variables
 const env = process.env.NODE_ENV || 'development'
@@ -44,9 +26,8 @@ if (env === 'development' || env === 'dev') {
 // GraphQL Schema
 const typeDefs = gql`
   type Query {
-    hello: String
     notes: [Note!]!
-    note(id: ID!): Note!
+    note(id: ID!): Note
   }
 
   type Note {
@@ -62,23 +43,20 @@ const typeDefs = gql`
 `
 const resolvers = {
   Query: {
-    hello: () => 'Hello world',
-    notes: async () => await Note.find({}),
-    note: (parent, { id }) => notes.find((note) => note.id == id),
+    notes: async () => await models.Note.find({}),
+    note: async (parent, { id }) => await models.Note.findById({ _id: id }),
   },
 
   Mutation: {
-    newNote: (parent, { content, author }) => {
+    newNote: async (parent, { content, author }) => {
       const note = {
-        id: notes.length + 1,
         content,
         author,
       }
-      notes.push(note)
-      return note
+      return await models.Note.create(note)
     },
-    deleteNote: (parent, { id }) => {
-      notes.filter((note) => note.id != id)
+    deleteNote: async (parent, { id }) => {
+      await models.Note.findOneAndRemove({ _id: id })
       return 'Note deleted'
     },
   },
