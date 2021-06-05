@@ -4,6 +4,8 @@ import express from 'express'
 import morgan from 'morgan'
 import { ApolloServer, gql } from 'apollo-server-express'
 
+import connection from './db/connectDB.js'
+
 const notes = [
   {
     id: 1,
@@ -27,6 +29,8 @@ const env = process.env.NODE_ENV || 'development'
 const port = process.env.PORT || 5000
 
 const app = express()
+
+connection.connect()
 
 // app settings
 if (env === 'development' || env === 'dev') {
