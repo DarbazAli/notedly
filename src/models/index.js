@@ -1,5 +1,5 @@
 import Note from './note.js'
-
-const models = { Note }
+import User from './user.js'
+const models = { Note, User }
 
 export default models

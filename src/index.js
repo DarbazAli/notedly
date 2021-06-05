@@ -3,6 +3,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import { ApolloServer } from 'apollo-server-express'
+import jwt from 'jsonwebtoken'
 
 import connection from './db/connectDB.js'
 import models from './models/index.js'
@@ -26,11 +27,24 @@ if (env === 'development' || env === 'dev') {
 
 /* ====================== APOLLO SERVER ========================== */
 
+const getUser = (token) => {
+  if (token) {
+    try {
+      return jwt.verify(token, process.env.JWT_SECRET)
+    } catch (err) {
+      throw new Error('Session invalid')
+    }
+  }
+}
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: () => {
-    return { models }
+  context: ({ req }) => {
+    const token = req.headers.authorization
+    const user = getUser(token)
+    console.log(user)
+    return { models, user }
   },
 })
 server.applyMiddleware({ app, path: '/api' })
