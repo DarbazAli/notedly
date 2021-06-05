@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import { ApolloServer, gql } from 'apollo-server-express'
 
 import connection from './db/connectDB.js'
+import Note from './models/noteModel.js'
 
 const notes = [
   {
@@ -62,7 +63,7 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: () => 'Hello world',
-    notes: () => notes,
+    notes: async () => await Note.find({}),
     note: (parent, { id }) => notes.find((note) => note.id == id),
   },
 
