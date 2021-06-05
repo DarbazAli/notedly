@@ -41,7 +41,7 @@ const typeDefs = gql`
   type Query {
     hello: String
     notes: [Note!]!
-    note(id: ID, author: String): Note!
+    note(id: ID!): Note!
   }
 
   type Note {
@@ -52,19 +52,16 @@ const typeDefs = gql`
 
   type Mutation {
     newNote(content: String!, author: String!): Note!
+    deleteNote(id: ID!): String
   }
 `
-
 const resolvers = {
-  // retrive data
   Query: {
-    hello: () => 'Hello World',
+    hello: () => 'Hello world',
     notes: () => notes,
-    note: (parent, { id, author }) =>
-      notes.find((note) => note.id == id || note.author == author),
+    note: (parent, { id }) => notes.find((note) => note.id == id),
   },
 
-  // mutate/modify data
   Mutation: {
     newNote: (parent, { content, author }) => {
       const note = {
@@ -74,6 +71,10 @@ const resolvers = {
       }
       notes.push(note)
       return note
+    },
+    deleteNote: (parent, { id }) => {
+      notes.filter((note) => note.id != id)
+      return 'Note deleted'
     },
   },
 }
