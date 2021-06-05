@@ -1,4 +1,4 @@
 import Query from './query.js'
 import Mutation from './mutation.js'
-
-export default { Query, Mutation }
+import { GraphQLDateTime } from 'graphql-iso-date'
+export default { Query, Mutation, DateTime: GraphQLDateTime }
