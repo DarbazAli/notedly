@@ -14,6 +14,7 @@ export default gql`
 
   type Mutation {
     newNote(content: String!, author: String!): Note!
-    deleteNote(id: ID!): String
+    updateNote(id: ID!, content: String!): Note
+    deleteNote(id: ID!): Boolean!
   }
 `
