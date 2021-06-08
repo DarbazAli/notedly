@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { AuthenticationError, ForbiddenError } from 'apollo-server-express'
@@ -7,36 +8,54 @@ import gravatar from '../lib/gravatar.js'
 dotenv.config()
 
 export default {
-  newNote: async (parent, args, { models }) => {
+  newNote: async (parent, args, { models, user }) => {
+    if (!user) {
+      throw new AuthenticationError('You must be signed in to create a note')
+    }
     const note = {
       content: args.content,
-      author: args.author,
+      author: mongoose.Types.ObjectId(user.id),
     }
     return await models.Note.create(note)
   },
 
-  deleteNote: async (parent, { id }, { models }) => {
+  deleteNote: async (parent, { id }, { models, user }) => {
+    if (!user) {
+      throw new AuthenticationError('You must be signed in to delete a note')
+    }
+    // find the note
+    const note = await models.Note.findById(id)
+    if (note && String(note.author) !== user.id) {
+      throw new ForbiddenError(
+        "You don't have persmissions to delete the note!"
+      )
+    }
     try {
-      const deletedNote = await models.Note.findOneAndRemove({ _id: id })
-      if (deletedNote) return true
-      else return false
+      await note.remove()
+      return true
     } catch (err) {
       return false
     }
   },
 
-  updateNote: async (parent, { id, content }, { models }) => {
-    try {
-      return await models.Note.findOneAndUpdate(
-        { _id: id },
-        {
-          $set: { content },
-        },
-        { new: true }
-      )
-    } catch (err) {
-      return 'Note not found'
+  updateNote: async (parent, { id, content }, { models, user }) => {
+    if (!user) {
+      throw new AuthenticationError('You must be signed in to update a note!')
     }
+
+    const note = await models.Note.findById(id)
+    if (note && String(note.author) !== user.id) {
+      throw new ForbiddenError("You don't have permissions to update the note!")
+    }
+
+    // if everything is good, update the note, and return the updated note
+    return await models.Note.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: { content },
+      },
+      { new: true }
+    )
   },
 
   // user auth
