@@ -6,6 +6,8 @@ import { ApolloServer } from 'apollo-server-express'
 import jwt from 'jsonwebtoken'
 import depthLimit from 'graphql-depth-limit'
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
+import cors from 'cors'
+import helmet from 'helmet'
 
 import connection from './db/connectDB.js'
 import models from './models/index.js'
@@ -26,6 +28,9 @@ if (env === 'development' || env === 'dev') {
   console.clear()
   app.use(morgan('dev'))
 }
+
+app.use(helmet())
+app.use(cors())
 
 /* ====================== APOLLO SERVER ========================== */
 
