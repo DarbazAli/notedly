@@ -4,6 +4,8 @@ import express from 'express'
 import morgan from 'morgan'
 import { ApolloServer } from 'apollo-server-express'
 import jwt from 'jsonwebtoken'
+import depthLimit from 'graphql-depth-limit'
+import { createComplexityLimitRule } from 'graphql-validation-complexity'
 
 import connection from './db/connectDB.js'
 import models from './models/index.js'
@@ -40,6 +42,7 @@ const getUser = (token) => {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  validationRules: [depthLimit(5), createComplexityLimitRule(1000)],
   context: ({ req }) => {
     const token = req.headers.authorization
     const user = getUser(token)

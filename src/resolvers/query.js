@@ -1,6 +1,7 @@
 export default {
   // bring up all notes
-  notes: async (parent, args, { models }) => await models.Note.find({}),
+  notes: async (parent, args, { models }) =>
+    await models.Note.find({}).limit(100),
 
   // get a single note by ID
   note: async (parent, args, { models }) =>
