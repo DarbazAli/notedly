@@ -1,6 +1,7 @@
 import Query from './query.js'
 import Mutation from './mutation.js'
-import { GraphQLDateTime } from 'graphql-iso-date'
+import gqlISODate from 'graphql-iso-date'
+const { GraphQLDateTime } = gqlISODate
 
 import Note from './note.js'
 import User from './user.js'
