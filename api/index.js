@@ -29,7 +29,8 @@ if (env === 'development' || env === 'dev') {
   app.use(morgan('dev'))
 }
 
-app.use(helmet())
+// app.use(helmet())
+app.use(helmet({ contentSecurityPolicy: (process.env.NODE_ENV === 'production') ? undefined : false }));
 app.use(cors())
 
 /* ====================== APOLLO SERVER ========================== */
